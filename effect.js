@@ -28,7 +28,7 @@ export function effect(fn, options = {}) {
       activeEffect = effectStack[effectStack.length - 1];
     }
   };
-  effectFn.deps = []; // 存储依赖的函数
+  effectFn.deps = []; // 用来存储所有与该副作用函数相关联的依赖集合，cleanup时用这个数组删除依赖关系，防止内存泄漏
   effectFn.options = options;
   if (!lazy) {
     effectFn();
