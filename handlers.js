@@ -4,7 +4,7 @@ import { reactive } from "./reactive.js";
 import { TrackOpTypes, TriggerOpTypes } from "./operations.js";
 
 const arrayInstrumentations = {};
-const RAW = Symbol("raw");
+const RAW = Symbol("raw");  // 代理对象可以通过这个属性找到原始对象
 
 // 当无法在代理对象中找到时，去原始数组中重新找一次
 ["includes", "indexOf", "lastIndexOf"].forEach((key) => {
@@ -32,11 +32,10 @@ const RAW = Symbol("raw");
   };
 });
 
-function get(target, key, receiver) {
+function get(target, key, receiver) { // receiver指的是代理对象
   if (key === RAW) {
     return target;
   }
-  // receiver指的是代理对象
   track(target, TrackOpTypes.GET, key);
 
   // 如果属性是个数组,且使用了数组中的方法，返回改动后的
@@ -91,16 +90,19 @@ function set(target, key, value, receiver) {
   return result;
 }
 
+// 针对in操作符
 function has(target, key) {
   track(target, TrackOpTypes.HAS, key);
   return Reflect.has(target, key); // 判断对象是否有相应的属性
 }
 
+// 针对for...in、Object.keys()、Object.entries()、Object.values()等操作 
 function ownKeys(target) {
   track(target, TrackOpTypes.ITERATE);
   return Reflect.ownKeys(target); // 返回对象的所有属性名
 }
 
+// 针对delete操作
 function deleteProperty(target, key) {
   // 原先有现在没有并且删除成功，才派发更新
   const hadkey = target.hasOwnProperty(key);
