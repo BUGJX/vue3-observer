@@ -19,6 +19,6 @@ export function reactive(target) {
   // 没有代理过，建立对应关系并返回代理
   const proxy = new Proxy(target, handlers);
   targetMap.set(target, proxy);
-  console.log(targetMap);
+  // console.log(targetMap);
   return proxy;
 }

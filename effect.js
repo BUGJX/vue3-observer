@@ -20,10 +20,12 @@ export function effect(fn, options = {}) {
   const effectFn = () => {
     try {
       activeEffect = effectFn;
+      // 在调用副作用函数之前将当前副作用函数压入栈中
       effectStack.push(effectFn);
       cleanup(effectFn);
       return fn();
     } finally {
+      // 在当前副作用函数执行完毕后，将当前副作用函数弹出栈，并把 activeEffect 还原为之前的值
       effectStack.pop();
       activeEffect = effectStack[effectStack.length - 1];
     }
@@ -97,7 +99,7 @@ export function track(target, type, key) {
 
   if (!depSet.has(activeEffect)) {
     depSet.add(activeEffect);
-    console.log(depSet);
+    // console.log(depSet);
     activeEffect.deps.push(depSet);
   }
 }
@@ -113,6 +115,7 @@ export function trigger(target, type, key) {
     if (effectFn === activeEffect) {
       continue;
     }
+    // 如果一个副作用函数存在调度器，则调用该调度器，并将副作用函数作为参数传递
     if (effectFn.options.scheduler) {
       effectFn.options.scheduler(effectFn);
     } else {

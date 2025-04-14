@@ -2,28 +2,39 @@ import { reactive } from "./reactive.js";
 import { effect } from "./effect.js";
 import { ref } from "./ref.js";
 import { computed } from "./computed.js";
-
+import { watch } from "./watch.js";
 // const state = ref(1);
 // effect(() => {
 //   console.log("effect", state.value);
 // });
 // state.value++;
 
-const obj = reactive({
-  a: 1,
-  b: 2,
-});
+// const obj = reactive({
+//   a: 1,
+//   b: 2,
+// });
 
-const sum = computed(() => {
-  console.log("computed");
-  return obj.a + obj.b;
-});
+// const sum = computed(() => {
+//   console.log("computed");
+//   return obj.a + obj.b;
+// });
 
-effect(() => {
-  console.log("render", sum.value);
-});
+// effect(() => {
+//   console.log("render", sum.value);
+// });
 
-obj.a++;
+// obj.a++;
+
+const data = { foo: 1, bar: 2 };
+const obj = reactive(data);
+
+watch(
+  () => obj.foo,
+  (newValue, oldValue) => {
+    console.log("watch", newValue, oldValue);
+  }
+);
+obj.foo++;
 
 // console.log(sum.value);
 // console.log(sum.value);
@@ -98,4 +109,3 @@ obj.a++;
 // 2.派发更新
 // 2.1：找到对应函数依次运行(getEffectFns(target, key, type))，期间需要将派发更新的操作行为与依赖收集的操作行为建立对应关系
 // 2.2：当前派发更新的函数和依赖收集的函数是同一个，则不执行派发更新操作
-
